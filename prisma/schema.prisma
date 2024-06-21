@@ -1,0 +1,51 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String
+  password String
+  name     String
+  email    String   @unique
+  role     String
+
+  // Define relation to transactions
+  transactions Transaction[]
+}
+
+model Product {
+  id          Int          @id @default(autoincrement())
+  name        String
+  type        String
+  price       Float
+  brand       String
+  stock       Int
+  expiredDate String
+  imageUrl    String       // Assuming imageUrl is the local path to the image
+
+  // Define relation to transactions
+  transactions Transaction[]
+}
+
+model Transaction {
+  id             Int       @id @default(autoincrement())
+  idCustomer     Int
+  idProduct      Int
+  quantity       Int
+  price          Float
+  totalPrice     Float
+  transactionDate DateTime @default(now())
+  status         String
+
+  // Define relation to User
+  user          User       @relation(fields: [idCustomer], references: [id])
+  
+  // Define relation to Product
+  product       Product    @relation(fields: [idProduct], references: [id])
+}
